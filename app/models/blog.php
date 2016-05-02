@@ -4,7 +4,19 @@ class Blog extends BaseModel {
     
     public function __construct($attributes) {
         parent::__construct($attributes);
-        $this->validators = array();
+        $this->validators = array('validate_content');
+    }
+    
+    public static function canEdit($blogId) {
+        if (empty($_SESSION['user'])) return false;
+        $query = DB::query('SELECT * FROM BlogOwner WHERE blogId = ? AND userId = ? LIMIT 1;',
+            array($blogId, $_SESSION['user']));
+        if ($query->fetch()) return true;
+        return false;
+    }
+    
+    public static function canDestroy($blogId) {
+        return isset($_SESSION['is_admin']) || self::canEdit($blogId);
     }
     
     public static function all() {
@@ -28,6 +40,8 @@ class Blog extends BaseModel {
     }
     
     public static function destroy($blogId) {
+        DB::query('DELETE FROM BlogPost WHERE blogId = ?;', array($blogId)); //must delete Comments/TagCloud/Likes linked with these posts?
+        DB::query('DELETE FROM BlogOwner WHERE blogId = ?;', array($blogId));
         DB::query('DELETE FROM Blog WHERE blogId = ?;', array($blogId));
     }
     
@@ -52,6 +66,23 @@ class Blog extends BaseModel {
             array('name' => $this->name, 'description' => $this->description));
         $row = $query->fetch();
         $this->blogId = $row['blogid'];
+        
+        $query = DB::query('INSERT INTO BlogOwner (blogId, userId) VALUES (?, ?);',
+            array($this->blogId, $_SESSION['user']));
+    }
+    
+    public function validate_content() {
+        $errors = array();
+        
+        if (empty($this->name)) {
+            $errors[] = 'Anna blogille nimi!';
+        }
+        
+        if (empty($this->description)) {
+            $errors[] = 'Anna blogille kuvaus!';
+        }
+        
+        return $errors;
     }
     
 }

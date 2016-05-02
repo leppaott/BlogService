@@ -1,5 +1,9 @@
 <?php
 
+function login_first() {
+  BaseController::require_logged_in();
+}
+
   $routes->get('/', function() {
     HomeController::index();
   });
@@ -22,9 +26,20 @@
   
   $routes->post('/register', function(){
     SessionController::handle_register();
+<<<<<<< HEAD
+=======
   });
   
-  $routes->post('/blog', function() {
+  $routes->get('/logout', function(){
+    SessionController::handle_logout();
+  });
+  
+  $routes->get('/blog', function() {
+    BlogController::index();
+>>>>>>> upstream/master
+  });
+  
+  $routes->post('/blog', 'login_first', function() {
     BlogController::store();
   });
   
@@ -40,11 +55,11 @@
     BlogController::edit($id);
   });
   
-  $routes->post('/blog/:id/edit', function($id) {
+  $routes->post('/blog/:id/edit', 'login_first', function($id) {
     BlogController::update($id);
   });
   
-  $routes->post('/blog/:id/destroy', function($id) {
+  $routes->post('/blog/:id/destroy', 'login_first', function($id) {
     BlogController::destroy($id);
   });
   
@@ -52,11 +67,11 @@
     PostController::index();
   });
   
-  $routes->post('/post', function() {
+  $routes->post('/post', 'login_first', function() {
     PostController::store();
   });
   
-  $routes->post('/post/new', function() {
+  $routes->post('/post/new', 'login_first', function() {
     PostController::create();
   });
   
@@ -73,6 +88,22 @@
     PostController::edit($id);
   });
   
+  $routes->post('/post/:id/edit', 'login_first', function($id) {
+    PostController::update($id);
+  });
+  
+  $routes->post('/post/:id/destroy', 'login_first', function($id) {
+    PostController::destroy($id);
+  });
+  
+  $routes->get('/post/:id/like', 'login_first', function($id) {
+    LikesController::like($id);
+  });
+  
+  $routes->get('/post/:id/follow', 'login_first', function($id) {
+    FollowsController::follow($id);
+  });
+  
   $routes->get('/user', function() {
     UserController::index();
   });
@@ -85,11 +116,15 @@
     UserController::edit($id);
   });
 
+<<<<<<< HEAD
   $routes->post('/comment', function() {
+=======
+  $routes->post('/comment', 'login_first', function() {
+>>>>>>> upstream/master
      CommentController::store(); 
   });
   
-  $routes->post('/comment/:id/destroy', function($id) {
+  $routes->post('/comment/:id/destroy', 'login_first', function($id) {
      CommentController::destroy($id); 
   });
   
@@ -97,6 +132,6 @@
     CommentController::edit($id);
   });
 
-  $routes->post('/comment/:id/edit', function($id) {
+  $routes->post('/comment/:id/edit', 'login_first', function($id) {
     CommentController::update($id);
   });

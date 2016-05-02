@@ -4,6 +4,7 @@ class Blogger extends BaseModel {
     
     public function __construct($attributes) {
         parent::__construct($attributes);
+        $this->validators = array('validate_content');
     }
     
     public static function all() {
@@ -16,10 +17,23 @@ class Blogger extends BaseModel {
         return $user[0];
     }
     
+<<<<<<< HEAD
     public static function isAdmin($userId) {
         $user = self::queryAndCollect('SELECT * FROM Admin WHERE userId = ? LIMIT 1;', array($userId));
         if (empty($user)) return false;
         return true;
+=======
+    public static function findByName($username) {
+        $user = self::queryAndCollect('SELECT * FROM Blogger WHERE username = ? LIMIT 1;', array($username));
+        if (empty($user)) return NULL;
+        return $user[0];
+    }
+    
+    public function isAdmin() {
+        $query = DB::query('SELECT * FROM Admin WHERE userId = ? LIMIT 1;', array($this->userId));
+        if ($query->fetch()) return true;
+        return false;
+>>>>>>> upstream/master
     }
     
     public static function getFollowers($userId) {
@@ -33,6 +47,7 @@ class Blogger extends BaseModel {
     }
     
     //getLikedPosts
+<<<<<<< HEAD
     
     public static function authenticate($username, $password) {
         $user = self::queryAndCollect('SELECT * FROM Blogger WHERE username = ? AND 
@@ -42,6 +57,9 @@ class Blogger extends BaseModel {
     }
 
     
+=======
+
+>>>>>>> upstream/master
     private static function queryAndCollect($q, $args = array()) {
         $query = DB::query($q, $args);        
         $rows = $query->fetchAll();
@@ -76,6 +94,24 @@ class Blogger extends BaseModel {
         }
         
         return false;
+    }
+
+    public function validate_content() {
+        $errors = array();
+            
+        if (empty($this->username)) {
+            $errors[] = 'Käytä validia käyttäjätunnusta!';
+        }
+        
+        if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
+            $errors[] = 'Käytä validia sähköpostia!';
+        }
+        
+        if (strlen($this->password) < 6) {
+            $errors[] = 'Käytä salasanassa vähintään kuusi merkkiä!';
+        }
+
+        return $errors;
     }
     
 }
